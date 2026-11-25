@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#b8431f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Sala prove">
+  <title>Sala prove — Cambia Genere</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icon-192.png">
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <header class="top">
+    <p class="eyebrow">Cambia Genere</p>
+    <h1>Sala prove</h1>
+    <p>Il jack del telefono va al mixer con un cavo a Y. Un canale è solo il click, l'altro è la musica.</p>
+  </header>
+
+  <p id="net" class="hint"></p>
+  <p id="status" class="status" role="status">Apri il pacchetto creato sul computer.</p>
+
+  <div class="actions">
+    <button type="button" id="pick-zip" class="primary">Apri un pacchetto</button>
+    <button type="button" id="pick-folder">Apri una cartella</button>
+    <input id="zip" type="file" accept=".zip,application/zip" hidden>
+    <input id="folder" type="file" webkitdirectory multiple hidden>
+  </div>
+
+  <section>
+    <h2>Sul telefono</h2>
+    <div id="saved"></div>
+  </section>
+
+  <section id="player" hidden>
+    <h2 id="title"></h2>
+    <p id="meta" class="hint"></p>
+    <p id="unsure" class="hint" hidden>L'accento sul primo tempo è una stima. Se cade sul levare, rifai il pacchetto sul computer scegliendo il metro.</p>
+
+    <div class="beat-wrap">
+      <div id="beat" class="beat" aria-hidden="true">·</div>
+      <p id="beat-label">In attesa</p>
+    </div>
+
+    <p id="clock" class="clock">0:00 / 0:00</p>
+    <input id="seek" type="range" min="0" max="1" value="0" step="0.01" aria-label="Posizione nel brano">
+
+    <button type="button" id="play" class="primary xl">Play</button>
+
+    <div class="tone">
+      <button type="button" id="tone-down" aria-label="Abbassa di un semitono">−</button>
+      <div>
+        <strong id="tone-value">0</strong>
+        <span>semitoni</span>
+      </div>
+      <button type="button" id="tone-up" aria-label="Alza di un semitono">+</button>
+    </div>
+    <p class="hint">La musica cambia tonalità subito, senza cambiare il tempo. Il click non viene trasposto e resta sull'altro canale. La scelta resta salvata su questo brano.</p>
+
+    <label class="field">Velocità
+      <select id="speed">
+        <option value="1">Normale</option>
+        <option value="0.85">Un po' più lento</option>
+        <option value="0.75">Più lento</option>
+        <option value="0.5">Metà velocità</option>
+      </select>
+    </label>
+    <p id="pitch-note" class="hint" hidden>Su questo browser rallentare cambia anche l'intonazione.</p>
+    <p class="hint">Rallentare non cambia la tonalità: il click resta alla sua altezza, la musica resta sui semitoni scelti. Il pitch shifter del telefono ritarda tutto di circa 35 millisecondi, click compreso, così i due canali restano insieme.</p>
+
+    <label class="field">Click prima della musica
+      <select id="lead">
+        <option value="0">Nessuna battuta</option>
+        <option value="1" selected>1 battuta</option>
+        <option value="2">2 battute</option>
+        <option value="4">4 battute</option>
+      </select>
+    </label>
+    <p class="hint">Il conteggio esce solo dal canale del click. Le casse restano zitte finché non parte la musica.</p>
+
+    <button type="button" id="preset-routing" class="primary">Click a sinistra, musica a destra</button>
+    <label class="check line"><input id="invert" type="checkbox"> Inverti i lati</label>
+    <p class="hint">Punta del jack = sinistra = click in cuffia. Anello = destra = musica verso le casse. Se senti il click dalle casse, inverti i lati. Il click non viene mai sommato alla musica.</p>
+
+    <div class="chips">
+      <button type="button" id="only-voice">Solo voce</button>
+      <button type="button" id="only-base">Base senza voce</button>
+      <button type="button" id="all-stems">Tutto</button>
+    </div>
+    <p class="hint">Queste tracce, sommate in mono, vanno alle casse. Le altre no.</p>
+    <div id="stems"></div>
+
+    <label class="field">Volume del click
+      <input id="click-volume" type="range" min="0" max="100" value="80">
+    </label>
+    <label class="field">Volume della musica
+      <input id="music-volume" type="range" min="0" max="100" value="100">
+    </label>
+
+    <div class="chips">
+      <button type="button" id="mark-a">Segna inizio</button>
+      <button type="button" id="mark-b">Segna fine</button>
+    </div>
+    <label class="check line"><input id="loop" type="checkbox"> Ripeti il tratto</label>
+    <p id="loop-label" class="hint">Nessun tratto segnato.</p>
+
+    <label class="check line"><input id="wake" type="checkbox"> Tieni lo schermo acceso</label>
+    <p class="hint">A schermo spento l'audio continua finché il telefono non sospende il player. Il click è dentro l'audio, non in un timer della pagina, quindi resta allineato. In modalità aereo funziona se hai già aperto questa pagina una volta e il brano è salvato qui.</p>
+    <button type="button" id="remove" class="quiet">Togli il brano dal telefono</button>
+  </section>
+
+  <audio id="stage" playsinline preload="auto"></audio>
+  <script src="./beat.js"></script>
+  <script src="./mix.js"></script>
+  <script src="./unzip.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
