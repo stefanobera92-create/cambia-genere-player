@@ -1,5 +1,5 @@
 /* Cache della pagina, così il player si apre anche senza rete. I brani stanno in IndexedDB. */
-const CACHE = "cambia-genere-player-v1";
+const CACHE = "cambia-genere-player-v2";
 const ASSETS = [
   "./",
   "./index.html",
