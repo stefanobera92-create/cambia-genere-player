@@ -184,10 +184,16 @@
       if (!blob) throw new Error("Manca il file " + stem.file + ".");
       const bytes = new Uint8Array(await blob.arrayBuffer());
       const decoded = await decodeMono(ctx, bytes);
+      const trimmed = mixApi.trimEncoderDelay(
+        decoded.samples,
+        decoded.sampleRate,
+        record.beats.duration || record.manifest.duration,
+        record.manifest.encoderDelaySec || 0
+      );
       monos.push({
         id: stem.id,
         label: stem.label,
-        samples: resample(decoded.samples, decoded.sampleRate, 44100),
+        samples: resample(trimmed, decoded.sampleRate, 44100),
       });
     }
     if (ctx.close) ctx.close();

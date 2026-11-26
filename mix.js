@@ -170,8 +170,19 @@
     return limitPeak(out);
   }
 
+  /* Alcuni decoder mp3 non tolgono il ritardo del codificatore (circa 25 ms): la musica
+     arriverebbe in ritardo sul click. Se il brano decodificato è più lungo del previsto
+     di quasi quel ritardo, lo togliamo noi dall'inizio. */
+  function trimEncoderDelay(samples, sampleRate, expectedSeconds, delaySeconds) {
+    if (!(delaySeconds > 0) || !(expectedSeconds > 0)) return samples;
+    const surplus = samples.length / sampleRate - expectedSeconds;
+    if (surplus < delaySeconds * 0.75) return samples;
+    return samples.subarray(Math.round(delaySeconds * sampleRate));
+  }
+
   return {
     PRESETS: PRESETS,
+    trimEncoderDelay: trimEncoderDelay,
     planRehearsal: planRehearsal,
     synthesizeClicks: synthesizeClicks,
     renderStereo: renderStereo,
